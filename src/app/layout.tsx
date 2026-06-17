@@ -24,8 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 href="/"
                 className="text-base sm:text-lg font-semibold tracking-tight text-gray-900 hover:text-gray-700 transition-colors shrink-0"
               >
-                <span className="hidden xs:inline">Job Application Tracker</span>
-                <span className="xs:hidden">Job Tracker</span>
+                <span className="hidden sm:inline">Job Application Tracker</span>
+                <span className="sm:hidden">Job Tracker</span>
               </Link>
               <Link
                 href="/new"
@@ -53,9 +53,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="flex-1">
             <div className="mx-auto max-w-5xl px-4 sm:px-6 py-5 sm:py-8">{children}</div>
           </main>
-          <footer className="border-t bg-white py-4 text-center text-xs text-gray-400">
-            Job Application Tracker · Built with Next.js &amp; PostgreSQL
-          </footer>
         </div>
         <Toast />
       </body>
