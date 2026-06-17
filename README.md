@@ -2,6 +2,8 @@
 
 A small full-stack CRUD app for tracking job applications. Built as an internship assessment — the goal is clean, complete, and correct over clever.
 
+**🔗 Live demo: <https://job-tracker-ecru-gamma.vercel.app/>**
+
 ## Project overview
 
 Track companies you've applied to, the role, status (Applied / Interviewing / Offer / Rejected), job type (Internship / Full-time / Part-time), applied date, and free-form notes. Filter by status, search by company or title, and edit or delete entries.
