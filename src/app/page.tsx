@@ -1,4 +1,4 @@
-import { ApplicationsList } from "@/components/ApplicationsList";
+import { HomeView } from "@/components/HomeView";
 
 export default function HomePage() {
   return (
@@ -9,7 +9,7 @@ export default function HomePage() {
           Track companies you&apos;ve applied to and where each application stands.
         </p>
       </div>
-      <ApplicationsList />
+      <HomeView />
     </div>
   );
 }

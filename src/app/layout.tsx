@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { Toast } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "Job Application Tracker",
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Job Application Tracker · Built with Next.js &amp; PostgreSQL
           </footer>
         </div>
+        <Toast />
       </body>
     </html>
   );

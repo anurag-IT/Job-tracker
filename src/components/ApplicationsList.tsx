@@ -5,19 +5,34 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Spinner } from "@/components/Spinner";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { flashToast } from "@/components/Toast";
 import { JOB_TYPE_LABEL, STATUS_LABEL } from "@/lib/labels";
 import { formatDate } from "@/lib/format";
 import type { Application } from "@/lib/types";
 import { STATUSES, Status } from "@/lib/validation";
 
 type Filter = "ALL" | Status;
+type SortKey = "companyName" | "appliedDate";
+type SortDir = "asc" | "desc";
+type SortState = { key: SortKey; dir: SortDir };
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: "ALL", label: "All" },
   ...STATUSES.map((s) => ({ value: s as Filter, label: STATUS_LABEL[s] })),
 ];
 
-export function ApplicationsList() {
+function sortItems(items: Application[], sort: SortState): Application[] {
+  const copy = [...items];
+  copy.sort((a, b) => {
+    if (sort.key === "companyName") {
+      return a.companyName.localeCompare(b.companyName);
+    }
+    return new Date(a.appliedDate).getTime() - new Date(b.appliedDate).getTime();
+  });
+  return sort.dir === "desc" ? copy.reverse() : copy;
+}
+
+export function ApplicationsList({ onMutate }: { onMutate?: () => void } = {}) {
   const [filter, setFilter] = useState<Filter>("ALL");
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -26,7 +41,16 @@ export function ApplicationsList() {
   const [loading, setLoading] = useState(false);
   const [toDelete, setToDelete] = useState<Application | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [sort, setSort] = useState<SortState>({ key: "appliedDate", dir: "desc" });
   const reqId = useRef(0);
+
+  function toggleSort(key: SortKey) {
+    setSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: key === "appliedDate" ? "desc" : "asc" },
+    );
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 300);
@@ -74,17 +98,26 @@ export function ApplicationsList() {
         throw new Error("Failed to delete");
       }
       setToDelete(null);
+      onMutate?.();
+      flashToast("success", "Application deleted");
     } catch (err) {
       setItems(prev);
-      setError(err instanceof Error ? err.message : "Failed to delete");
+      const msg = err instanceof Error ? err.message : "Failed to delete";
+      setError(msg);
+      flashToast("error", msg);
     } finally {
       setDeleting(false);
     }
-  }, [toDelete, items]);
+  }, [toDelete, items, onMutate]);
 
   const empty = useMemo(
     () => !loading && items !== null && items.length === 0,
     [loading, items],
+  );
+
+  const sortedItems = useMemo(
+    () => (items ? sortItems(items, sort) : []),
+    [items, sort],
   );
 
   return (
@@ -154,8 +187,13 @@ export function ApplicationsList() {
         <EmptyState />
       ) : (
         <>
-          <DesktopTable items={items ?? []} onDelete={setToDelete} />
-          <MobileCards items={items ?? []} onDelete={setToDelete} />
+          <DesktopTable
+            items={sortedItems}
+            onDelete={setToDelete}
+            sort={sort}
+            onSort={toggleSort}
+          />
+          <MobileCards items={sortedItems} onDelete={setToDelete} />
         </>
       )}
 
@@ -202,20 +240,24 @@ function EmptyState() {
 function DesktopTable({
   items,
   onDelete,
+  sort,
+  onSort,
 }: {
   items: Application[];
   onDelete: (a: Application) => void;
+  sort: SortState;
+  onSort: (key: SortKey) => void;
 }) {
   return (
     <div className="hidden overflow-hidden rounded-2xl border bg-white shadow-sm md:block">
       <table className="min-w-full divide-y divide-gray-200 text-sm">
         <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
           <tr>
-            <th className="px-5 py-3">Company</th>
+            <SortableTh label="Company" sortKey="companyName" sort={sort} onSort={onSort} />
             <th className="px-5 py-3">Job title</th>
             <th className="px-5 py-3">Status</th>
             <th className="px-5 py-3">Type</th>
-            <th className="px-5 py-3">Applied</th>
+            <SortableTh label="Applied" sortKey="appliedDate" sort={sort} onSort={onSort} />
             <th className="px-5 py-3 text-right">Actions</th>
           </tr>
         </thead>
@@ -281,6 +323,37 @@ function MobileCards({
         </li>
       ))}
     </ul>
+  );
+}
+
+function SortableTh({
+  label,
+  sortKey,
+  sort,
+  onSort,
+}: {
+  label: string;
+  sortKey: SortKey;
+  sort: SortState;
+  onSort: (key: SortKey) => void;
+}) {
+  const active = sort.key === sortKey;
+  const arrow = !active ? "↕" : sort.dir === "asc" ? "↑" : "↓";
+  return (
+    <th className="px-5 py-3">
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        className={`inline-flex items-center gap-1 uppercase tracking-wider text-xs font-semibold transition-colors ${
+          active ? "text-gray-900" : "text-gray-500 hover:text-gray-700"
+        }`}
+        aria-label={`Sort by ${label}`}
+        aria-sort={active ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
+      >
+        {label}
+        <span aria-hidden="true" className="text-[10px]">{arrow}</span>
+      </button>
+    </th>
   );
 }
 

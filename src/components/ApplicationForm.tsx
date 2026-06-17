@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { JOB_TYPE_LABEL, STATUS_LABEL } from "@/lib/labels";
+import { flashToast } from "@/components/Toast";
 import {
   CreateApplicationInput,
   JOB_TYPES,
@@ -81,6 +82,10 @@ export function ApplicationForm({ mode, initial }: Props) {
             : "Failed to save";
         throw new Error(msg);
       }
+      flashToast(
+        "success",
+        mode === "create" ? "Application created" : "Application updated",
+      );
       router.push("/");
       router.refresh();
     } catch (err) {
