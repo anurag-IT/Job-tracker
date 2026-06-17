@@ -25,7 +25,7 @@ export const createApplicationSchema = z.object({
     .trim()
     .max(5000, "Notes must be 5000 characters or fewer")
     .optional()
-    .or(z.literal("").transform(() => undefined)),
+    .transform((v) => (v === "" ? undefined : v)),
 });
 
 export const updateApplicationSchema = createApplicationSchema.partial();
