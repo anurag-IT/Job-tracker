@@ -11,6 +11,29 @@ body {
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+/* Ensure tap targets are at least 44px on mobile */
+@media (max-width: 640px) {
+  button,
+  [role="button"],
+  a {
+    min-height: 36px;
+  }
+}
+
+/* Horizontal scroll utility for filter pills on small screens */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

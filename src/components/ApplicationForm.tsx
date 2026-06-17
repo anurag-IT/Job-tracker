@@ -91,9 +91,15 @@ export function ApplicationForm({ mode, initial }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-lg border bg-white p-6 shadow-sm">
+    <form
+      onSubmit={onSubmit}
+      className="space-y-5 rounded-2xl border bg-white p-5 sm:p-7 shadow-sm"
+    >
       {serverError && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
           {serverError}
         </div>
       )}
@@ -105,6 +111,7 @@ export function ApplicationForm({ mode, initial }: Props) {
           className={inputCls(errors.companyName)}
           value={values.companyName}
           onChange={(e) => update("companyName", e.target.value)}
+          placeholder="e.g. Google, Amazon, Stripe"
           required
         />
       </Field>
@@ -116,11 +123,12 @@ export function ApplicationForm({ mode, initial }: Props) {
           className={inputCls(errors.jobTitle)}
           value={values.jobTitle}
           onChange={(e) => update("jobTitle", e.target.value)}
+          placeholder="e.g. Software Engineer Intern"
           required
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Job type" error={errors.jobType} htmlFor="jobType">
           <select
             id="jobType"
@@ -173,25 +181,28 @@ export function ApplicationForm({ mode, initial }: Props) {
           rows={4}
           className={inputCls(errors.notes)}
           value={values.notes ?? ""}
-          onChange={(e) => update("notes", e.target.value === "" ? undefined : e.target.value)}
+          placeholder="Any notes about this application…"
+          onChange={(e) =>
+            update("notes", e.target.value === "" ? undefined : e.target.value)
+          }
         />
       </Field>
 
-      <div className="flex items-center justify-end gap-2 pt-2">
+      <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:items-center sm:justify-end">
         <button
           type="button"
           onClick={() => router.back()}
-          className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors sm:w-auto"
           disabled={submitting}
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60"
+          className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-700 active:bg-gray-800 transition-colors disabled:opacity-60 sm:w-auto"
           disabled={submitting}
         >
-          {submitting ? "Saving…" : mode === "create" ? "Create" : "Save changes"}
+          {submitting ? "Saving…" : mode === "create" ? "Create application" : "Save changes"}
         </button>
       </div>
     </form>
@@ -211,18 +222,25 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700 mb-1.5">
         {label}
       </label>
-      <div className="mt-1">{children}</div>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {children}
+      {error && (
+        <p className="mt-1.5 flex items-center gap-1 text-xs text-red-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
 
 function inputCls(hasError?: string) {
   return [
-    "block w-full rounded-md border bg-white px-3 py-2 text-sm shadow-sm",
+    "block w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm shadow-sm transition-colors",
     "focus:outline-none focus:ring-2",
     hasError
       ? "border-red-400 focus:border-red-500 focus:ring-red-200"
