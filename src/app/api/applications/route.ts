@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { createApplicationSchema, listQuerySchema } from "@/lib/validation";
 import { jsonError, zodErrorResponse } from "@/lib/http";
 
+// Data endpoints must always reflect the live database, never a cached build.
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

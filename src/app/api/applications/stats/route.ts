@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { STATUSES, type Status } from "@/lib/validation";
 import { jsonError } from "@/lib/http";
 
+// Always read live from the database — never statically cache this response.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const grouped = await prisma.application.groupBy({
