@@ -14,8 +14,8 @@ export const JOB_TYPE_LABEL: Record<JobType, string> = {
 };
 
 export const STATUS_BADGE: Record<Status, string> = {
-  APPLIED: "bg-blue-100 text-blue-800 ring-blue-200",
-  INTERVIEWING: "bg-amber-100 text-amber-800 ring-amber-200",
-  OFFER: "bg-green-100 text-green-800 ring-green-200",
-  REJECTED: "bg-red-100 text-red-800 ring-red-200",
+  APPLIED:      "bg-blue-500 text-white ring-blue-400",
+  INTERVIEWING: "bg-amber-400 text-amber-950 ring-amber-300",
+  OFFER:        "bg-emerald-500 text-white ring-emerald-400",
+  REJECTED:     "bg-red-500 text-white ring-red-400",
 };
