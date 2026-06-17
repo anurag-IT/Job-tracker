@@ -52,7 +52,7 @@ See [.env.example](.env.example). Only one variable is required:
 
 | Variable       | Description                            | Example                                                                  |
 | -------------- | -------------------------------------- | ------------------------------------------------------------------------ |
-| `DATABASE_URL` | PostgreSQL connection string for Prisma | `postgresql://postgres:postgres@localhost:5432/job_tracker?schema=public` |
+| `DATABASE_URL` | PostgreSQL connection string for Prisma | `postgresql://postgres:postgres@localhost:5433/job_tracker?schema=public` |
 
 ## Running
 
@@ -77,7 +77,7 @@ npm run test:watch    # watch mode
 docker compose up --build
 ```
 
-The app container runs `prisma migrate deploy` on startup, so the schema is applied automatically. App is at <http://localhost:3000>, Postgres at `localhost:5432`.
+The app container runs `prisma migrate deploy` on startup, so the schema is applied automatically. App is at <http://localhost:3000>, Postgres exposed on host port `5433` (mapped from container port `5432`).
 
 ## API documentation
 
@@ -157,17 +157,22 @@ src/
     api/applications/
       route.ts            # GET (list) + POST (create)
       [id]/route.ts       # GET / PATCH / DELETE one
+      stats/route.ts      # GET counts grouped by status
     [id]/
       page.tsx            # View detail
       edit/page.tsx       # Edit form
     new/page.tsx          # Create form
-    page.tsx              # List + filter + search
+    page.tsx              # Home (stats + list)
     layout.tsx
     globals.css
+    icon.svg              # Auto-served as favicon
     not-found.tsx
   components/
-    ApplicationsList.tsx  # Client list with filter, debounced search, optimistic delete
+    ApplicationsList.tsx  # Client list with filter, debounced search, sort, optimistic delete
     ApplicationForm.tsx   # Shared create/edit form (Zod client-side)
+    HomeView.tsx          # Wires StatsCards + ApplicationsList together
+    StatsCards.tsx        # Dashboard count cards
+    Toast.tsx             # Success/error toast (sessionStorage + DOM event)
     StatusBadge.tsx
     ConfirmDialog.tsx
     Spinner.tsx
@@ -186,9 +191,12 @@ prisma/
 ## Features
 
 - Responsive table on desktop, cards on mobile
+- Dashboard stat cards (Total + per-status counts) on the home page
 - Status filter tabs + debounced search (300 ms)
+- Click-to-sort on Company and Applied-date columns
 - Add / Edit / View / Delete with confirmation dialog
 - Optimistic delete (reverts on failure)
+- Success / error toast notifications on create, edit, and delete
 - Loading and error states on every fetch
 - Empty state when no applications match
 - TypeScript strict mode, no `any`
@@ -196,10 +204,32 @@ prisma/
 
 ## Screenshots
 
-> Replace the placeholders with real screenshots after running locally.
+### Application list (desktop)
 
-- List view (desktop): `![List view](docs/screenshots/list-desktop.png)`
-- List view (mobile): `![List view mobile](docs/screenshots/list-mobile.png)`
-- Add application form: `![Add form](docs/screenshots/form.png)`
-- Detail view: `![Detail view](docs/screenshots/detail.png)`
-- Filter + search in action: `![Filter](docs/screenshots/filter.png)`
+Responsive table with dashboard stat cards, status filter tabs, search, and sortable columns.
+
+![Application list on desktop](docs/screenshots/list-desktop.jpg)
+
+### Application list (mobile)
+
+The same data collapses into stacked cards on small screens.
+
+![Application list on mobile](docs/screenshots/list-mobile.jpg)
+
+### Add / edit application form
+
+Shared form for creating and editing, with client-side validation.
+
+![Add application form](docs/screenshots/form.jpg)
+
+### Application detail
+
+Read-only view of a single application, including notes.
+
+![Application detail](docs/screenshots/detail.jpg)
+
+### Filter by status
+
+Filtering the list down to a single status.
+
+![List filtered by status](docs/screenshots/filter.jpg)
